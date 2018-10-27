@@ -1,11 +1,11 @@
 {
-  "name": "example-create-react-app-express",
+  "name": "Insta-liker",
   "version": "1.0.0",
-  "description": "Example on using create-react-app with a Node Express Backend",
+  "description": "Insta-liker.",
   "author": {
-    "name": "Esau Silva",
-    "email": "esausilva85@gmail.com",
-    "url": "https://esausilva.com"
+    "name": "Frank Tsai",
+    "email": "franks0059@gmail.com",
+    "url": "https://ju5td0m7m1nd.com"
   },
   "license": "MIT",
   "scripts": {
