@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Banner from "./components/Banner";
+import CookieForm from "./components/CookieForm";
 
 const URL = hashtag => `https://www.instagram.com/explore/tags/${hashtag}/`;
 const LOCATION_URL = "https://www.instagram.com/explore/locations/213032423/";
@@ -15,6 +16,12 @@ const HEADERS = {
   "x-instagram-ajax": "d4e4c9fdb67b"
 };
 
+const SpaceBetween = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const Container = styled.div`
   display: flex;
   align-items: center;
@@ -24,10 +31,10 @@ const Container = styled.div`
 `;
 
 const Input = styled.input`
-  width: 10em;
+  width: 60%;
   border: 0px;
   border-bottom: 1px solid #202020;
-  font-size: 1em;
+  font-size: 2em;
   background-color: transparent;
   padding: 8px;
   outline: none;
@@ -38,15 +45,25 @@ const SearchBtn = styled.button`
   color: #fff;
   padding: 9px;
   border: 0px;
-  margin-right: 2em;
   cursor: pointer;
+  font-size: 1em;
+  margin-top: 2em;
 `;
 
 const InputWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 10em;
+`;
+
+const ContentWrapper = styled.div`
+  background-color: transparent;
+  width: 100%;
+  height: 3em;
+  margin: 2em 0px;
 `;
 
 const Grid = styled.div`
@@ -64,19 +81,61 @@ const GridPhoto = styled.img`
   margin-top: 2em;
 `;
 
+const Name = styled.h2`
+  font-size: 2em;
+  color: #202020;
+  text-align: center;
+  margin: 3em 0px;
+`;
+
+const StartBtn = styled.div`
+  outline: none;
+  border: 0px;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2em 0px;
+`;
+
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       data: {},
       media: {},
-      likedImage: []
+      likedImage: [],
+      liking: false,
+      cookie: "",
+      xCsrfToken: "",
+      xInstagramAjax: ""
     };
   }
   componentDidMount() {}
+
+  _onChange = (type, value) => this.setState({ [type]: value });
+
+  _checkIfValid = () => {
+    const { cookie, xCsrfToken, xInstagramAjax } = this.state;
+    fetch(
+      `/api/check?cookie=${cookie}&xCsrfToken=${xCsrfToken}&xInstagramAjax=${xInstagramAjax}`
+    )
+      .then(r => r.json())
+      .then(response => {
+        this.setState({ valid: true, username: response.data.user.username });
+      })
+      .catch(e => {
+        throw new Error(e);
+      });
+  };
+
   _likePhoto = id => {
+    const { cookie, xCsrfToken, xInstagramAjax } = this.state;
     if (this.state.likedImage.indexOf(id) < 0) {
-      fetch(`http://localhost:5000/api/like?id=${id}`)
+      fetch(
+        `/api/like?id=${id}&cookie=${cookie}&xCsrfToken=${xCsrfToken}&xInstagramAjax=${xInstagramAjax}`
+      )
         .then(r => r.json())
         .then(response => {
           if (response.status === "ok") {
@@ -90,7 +149,10 @@ class Home extends React.Component {
   };
 
   _checkIfLiked = id => {
-    fetch(`http://localhost:5000/api/checkIfLiked?id=${id}`)
+    const { cookie, xCsrfToken, xInstagramAjax } = this.state;
+    fetch(
+      `/api/checkIfLiked?id=${id}&cookie=${cookie}&xCsrfToken=${xCsrfToken}&xInstagramAjax=${xInstagramAjax}`
+    )
       .then(r => r.json())
       .then(response => {
         if (response.graphql.shortcode_media.viewer_has_liked) {
@@ -142,28 +204,51 @@ class Home extends React.Component {
         throw new Error(e);
       });
   };
-  _startLiker = () =>
+  _startLiker = () => {
+    this.setState({ liking: true });
     this.state.media.edges.map((n, key) => {
       setTimeout(() => {
         this._likePhoto(n.node.id);
         // console.log(n.node.shortcode, `  ${key}`);
       }, 2000 * (key + 1));
     });
+  };
+
   render() {
-    const { data, media, likedImage } = this.state;
+    const { data, media, likedImage, valid, username, liking } = this.state;
     const hasImages = Object.keys(media).indexOf("edges") > 0;
 
     return (
       <div>
-        <Banner />
-        <InputWrapper>
-          <Input
-            placeholder="hashtag"
-            onChange={e => this.setState({ hashtag: e.target.value })}
-          />
-          <SearchBtn onClick={this._search}>Search</SearchBtn>
-          <button onClick={this._startLiker}>Auto like</button>
-        </InputWrapper>
+        <SpaceBetween>
+          <div>
+            <Banner />
+          </div>
+        </SpaceBetween>
+        <CookieForm
+          onChange={this._onChange}
+          _checkValid={this._checkIfValid}
+        />
+        {valid
+          ? <InputWrapper>
+              <Name>
+                哈囉, {username}, 我已經準備就緒
+              </Name>
+              <Input
+                placeholder="hashtag"
+                onChange={e => this.setState({ hashtag: e.target.value })}
+              />
+              <SearchBtn onClick={this._search}>搜尋</SearchBtn>
+            </InputWrapper>
+          : null}
+
+        {hasImages ? <ContentWrapper /> : null}
+        {hasImages
+          ? <StartBtn onClick={this._startLiker}>
+              {liking ? <div className="lds-dual-ring" /> : null}
+              {liking ? "努力按讚中" : "開始按讚"}
+            </StartBtn>
+          : null}
         <Grid>
           {hasImages
             ? media.edges.map(node => {
