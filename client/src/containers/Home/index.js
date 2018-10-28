@@ -2,11 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import Banner from "./components/Banner";
 
-const GridPhoto = styled.img`
-  width: 10em;
-  opacity: ${props => (props.checked ? 1 : 0.7)};
-`;
-
 const URL = hashtag => `https://www.instagram.com/explore/tags/${hashtag}/`;
 const LOCATION_URL = "https://www.instagram.com/explore/locations/213032423/";
 const LAZY_LOADING = endCursor =>
@@ -26,6 +21,47 @@ const Container = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   width: 100%;
+`;
+
+const Input = styled.input`
+  width: 10em;
+  border: 0px;
+  border-bottom: 1px solid #202020;
+  font-size: 1em;
+  background-color: transparent;
+  padding: 8px;
+  outline: none;
+`;
+
+const SearchBtn = styled.button`
+  background-color: #202020;
+  color: #fff;
+  padding: 9px;
+  border: 0px;
+  margin-right: 2em;
+  cursor: pointer;
+`;
+
+const InputWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+`;
+
+const Grid = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 2em;
+`;
+
+const GridPhoto = styled.img`
+  width: 10em;
+  opacity: ${props => (props.checked ? 1 : 0.7)};
+  margin-left: 2em;
+  margin-top: 2em;
 `;
 
 class Home extends React.Component {
@@ -109,8 +145,8 @@ class Home extends React.Component {
   _startLiker = () =>
     this.state.media.edges.map((n, key) => {
       setTimeout(() => {
-        // this._likePhoto(n.node.id)
-        console.log(n.node.shortcode, `  ${key}`);
+        this._likePhoto(n.node.id);
+        // console.log(n.node.shortcode, `  ${key}`);
       }, 2000 * (key + 1));
     });
   render() {
@@ -120,24 +156,28 @@ class Home extends React.Component {
     return (
       <div>
         <Banner />
-        <input
-          placeholder="hashtag"
-          onChange={e => this.setState({ hashtag: e.target.value })}
-        />
-        <button onClick={this._search}>Search</button>
-        <button onClick={this._startLiker}>Auto like</button>
-        {hasImages
-          ? media.edges.map(node => {
-              return (
-                <GridPhoto
-                  src={node.node.display_url}
-                  key={node.node.id}
-                  checked={likedImage.indexOf(node.node.id) > -1}
-                  onClick={() => this._likePhoto(node.node.id)}
-                />
-              );
-            })
-          : null}
+        <InputWrapper>
+          <Input
+            placeholder="hashtag"
+            onChange={e => this.setState({ hashtag: e.target.value })}
+          />
+          <SearchBtn onClick={this._search}>Search</SearchBtn>
+          <button onClick={this._startLiker}>Auto like</button>
+        </InputWrapper>
+        <Grid>
+          {hasImages
+            ? media.edges.map(node => {
+                return (
+                  <GridPhoto
+                    src={node.node.display_url}
+                    key={node.node.id}
+                    checked={likedImage.indexOf(node.node.id) > -1}
+                    onClick={() => this._likePhoto(node.node.id)}
+                  />
+                );
+              })
+            : null}
+        </Grid>
       </div>
     );
   }

@@ -17,10 +17,7 @@ const HEADER = {
   "x-csrftoken": "tjDzUcrzKATRahrEFPxfLkRDo67SKgwN",
   "x-instagram-ajax": "37b9c96f42db"
 };
-// API calls
-app.get("/api/hello", (req, res) => {
-  res.send({ express: "Hello From Express" });
-});
+
 app.get("/api/like", (req, res) => {
   const { query } = req;
   const { id } = query;
