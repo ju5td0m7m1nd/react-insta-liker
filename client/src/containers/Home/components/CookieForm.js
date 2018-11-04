@@ -76,7 +76,7 @@ const Image = styled.img`
 
 const Tutorial = styled.a`
   background-color: #234;
-  color: #F0F0F0;
+  color: #f0f0f0;
   border-radius: 50%;
   text-decoration: none;
   width: 2em;
@@ -87,7 +87,7 @@ const Tutorial = styled.a`
   justify-content: center;
   right: 8px;
   bottom: 8px;
-`
+`;
 
 class CookieForm extends React.Component {
   constructor(props) {
@@ -112,7 +112,12 @@ class CookieForm extends React.Component {
             onChange={e => onChange("xInstagramAjax", e.target.value)}
           />
           <Button onClick={_checkValid}>確認用戶</Button>
-          <Tutorial target="_blank" href="">?</Tutorial>
+          <Tutorial
+            target="_blank"
+            href="https://medium.com/@ju5td0m7m1nd/instaliker-instagram-%E8%A1%8C%E9%8A%B7%E6%A9%9F%E5%99%A8%E4%BA%BA-bc5911b90e70"
+          >
+            ?
+          </Tutorial>
         </Form>
         <Image src="/iphonex.jpeg" />
       </SpaceBetween>
