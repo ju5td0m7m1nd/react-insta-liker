@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "react-ga": "^2.5.3"
   },
   "devDependencies": {
     "concurrently": "^4.0.1"

@@ -18,6 +18,7 @@ const Form = styled.div`
   height: 100%;
   width: 60%;
   background-color: #e3e3e3;
+  position: relative;
   color: #707070;
   padding: 2em;
   display: flex;
@@ -54,6 +55,13 @@ const Button = styled.button`
   color: #202020;
   margin-top: 2em;
   border: 0px;
+  transition: all .3s ease-in;
+  font-weight: bold;
+  cursor: pointer;
+  &:hover {
+    box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
+      0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  }
 `;
 
 const Image = styled.img`
@@ -65,6 +73,21 @@ const Image = styled.img`
     width: 100%;
   }
 `;
+
+const Tutorial = styled.a`
+  background-color: #234;
+  color: #F0F0F0;
+  border-radius: 50%;
+  text-decoration: none;
+  width: 2em;
+  height: 2em;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 8px;
+  bottom: 8px;
+`
 
 class CookieForm extends React.Component {
   constructor(props) {
@@ -89,6 +112,7 @@ class CookieForm extends React.Component {
             onChange={e => onChange("xInstagramAjax", e.target.value)}
           />
           <Button onClick={_checkValid}>確認用戶</Button>
+          <Tutorial target="_blank" href="">?</Tutorial>
         </Form>
         <Image src="/iphonex.jpeg" />
       </SpaceBetween>
