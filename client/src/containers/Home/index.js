@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import Banner from "./components/Banner";
 import CookieForm from "./components/CookieForm";
+import GridPhoto from "./components/GridPhoto";
 import ReactGA from "react-ga";
 
 const URL = hashtag => `https://www.instagram.com/explore/tags/${hashtag}/`;
@@ -10,12 +11,6 @@ const LAZY_LOADING = endCursor =>
   `https://www.instagram.com/graphql/query/?query_hash=f92f56d47dc7a55b606908374b43a314&variables=%7B%22tag_name%22%3A%22vscotaiwan%22%2C%22show_ranked%22%3Afalse%2C%22first%22%3A2%2C%22after%22%3A%22${endCursor.split(
     "=="
   )[0]}%3D%3D%22%7D`;
-
-const HEADERS = {
-  cookie: `csrftoken=McOO9gccBv4XR7J7cYTOGd27E412Fd8O; ds_user_id=43837610; mid=Wz5hDQAEAAHMyCReHMw9li8xlEPx; mcd=3; fbm_124024574287414=base_domain=.instagram.com; csrftoken=McOO9gccBv4XR7J7cYTOGd27E412Fd8O; shbid=3317; shbts=1540281796.6660485; sessionid=IGSC65620fc06b7e93632148a9f68b9d568110170968759c37e875e8d62084b39249%3AiSiiApzN7bEvhD7hjmgZNwLcrzaB6uV9%3A%7B%22_auth_user_id%22%3A43837610%2C%22_auth_user_backend%22%3A%22accounts.backends.CaseInsensitiveModelBackend%22%2C%22_token%22%3A%2243837610%3AUYGmAN6JsVE9Ih6extk2HXxpbHKcNB4t%3A8a141fdec3ad23573ee2197a638628cc8164169f70510dc948562f80d158151c%22%2C%22_platform%22%3A4%2C%22_remote_ip%22%3A%22218.161.58.209%22%2C%22_mid%22%3A%22WL12_gAEAAEC0gLb1USxNr09uXmD%22%2C%22_user_agent_md5%22%3A%2297de1fddac67554e2eb90d9a46b3dcd4%22%2C%22_token_ver%22%3A2%2C%22last_refreshed%22%3A1540281796.6673510075%7D; rur=ATN; fbsr_124024574287414=F5-xXWVYzq9zu3E3i1aLyxYvXbc7mJ-DvYnwbz408Lw.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImNvZGUiOiJBUUNEUnI1VDlaU1ctZkhyb0N2MDRSNG93STY0SEx4WnRJcUhNT041NzE0ZXY1MV9hZlpyQVNpaTZXOWxzNVpkTXBPTDFBRC1wZGVjcHRocFZEakhOa210ZmxJOEppMnlVbUdRaWlUalExRjdUbFhReEZlSjN4QVVxU0w1X0hfcjN3SzQzNVBha3pySTg3dVhmc25kX1Vyb3VWSmJYRnR4TmRZVUR3Q0FXdHVwcFhUcjNSMFkwZjJ0V0lPNHQzSUNMOTVjakh4VVVtZFo1dU9PZHF0ZXdHRHJjZWdYVXJYQ0hCeURnQlhaVncweVhTd1pMbFl3X2t0Q1ViQ3g0SEQ3QnF2ZlZyckdMMl9RTGc1NVJYZHNaX2gtRVdzOVdsSnJXZkpib0ZreURzbWpZOGxVd1Nyb2dhTHVnOGk3QllDV19LdXZkY2NSVnVxNk5MaFZDeUplZXJXNCIsImlzc3VlZF9hdCI6MTU0MDI4MTc5OSwidXNlcl9pZCI6IjEwMDAwMjQ0NDc4MzU2OCJ9; urlgen="{}:1gEri6:AsKDD7ZAaGSV_GvUh4gihdF56Ws"`,
-  "x-csrftoken": "McOO9gccBv4XR7J7cYTOGd27E412Fd8O",
-  "x-instagram-ajax": "d4e4c9fdb67b"
-};
 
 const SpaceBetween = styled.div`
   display: flex;
@@ -75,13 +70,6 @@ const Grid = styled.div`
   margin-top: 2em;
 `;
 
-const GridPhoto = styled.img`
-  width: 10em;
-  opacity: ${props => (props.checked ? 1 : 0.7)};
-  margin-left: 2em;
-  margin-top: 2em;
-`;
-
 const Name = styled.h2`
   font-size: 2em;
   color: #202020;
@@ -138,7 +126,12 @@ class Home extends React.Component {
     };
   }
   componentDidMount() {}
-
+  componentWillReceiveProps(nextProps) {
+    const { cookie, xCsrfToken, xInstagramAjax } = nextProps;
+    if (nextProps.cookie && !this.state.cookie) {
+      this.setState({ cookie, xCsrfToken, xInstagramAjax }, this._checkIfValid);
+    }
+  }
   _onChange = (type, value) => this.setState({ [type]: value });
 
   _checkIfValid = () => {
@@ -279,10 +272,13 @@ class Home extends React.Component {
             <Banner />
           </div>
         </SpaceBetween>
-        <CookieForm
-          onChange={this._onChange}
-          _checkValid={this._checkIfValid}
-        />
+        {!valid
+          ? <CookieForm
+              onChange={this._onChange}
+              _checkValid={this._checkIfValid}
+            />
+          : null}
+
         {valid
           ? <InputWrapper>
               <Name>
