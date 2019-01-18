@@ -1,9 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import Banner from "./components/Banner";
-import CookieForm from "./components/CookieForm";
-import GridPhoto from "./components/GridPhoto";
 import ReactGA from "react-ga";
+import LoginForm from "./components/LoginForm";
 
 const URL = hashtag => `https://www.instagram.com/explore/tags/${hashtag}/`;
 const LOCATION_URL = "https://www.instagram.com/explore/locations/213032423/";
@@ -16,100 +14,24 @@ const SpaceBetween = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-`;
-
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
   width: 100%;
+  height: 100%;
+  padding: 0px 5%;
 `;
 
-const Input = styled.input`
-  width: 60%;
-  border: 0px;
-  border-bottom: 1px solid #202020;
-  font-size: 2em;
-  background-color: transparent;
-  padding: 8px;
-  outline: none;
-`;
+const Banner = styled.div`
+  width: 40%;
 
-const SearchBtn = styled.button`
-  background-color: #202020;
-  color: #fff;
-  padding: 9px;
-  border: 0px;
-  cursor: pointer;
-  font-size: 1em;
-  margin-top: 2em;
-`;
-
-const InputWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  margin-top: 2em;
-`;
-
-const ContentWrapper = styled.div`
-  background-color: transparent;
-  width: 100%;
-  height: 3em;
-  margin: 2em 0px;
-`;
-
-const Grid = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  margin-top: 2em;
-`;
-
-const Name = styled.h2`
-  font-size: 2em;
-  color: #202020;
-  text-align: center;
-  margin: 3em 0px;
-`;
-
-const StartBtn = styled.div`
-  outline: none;
-  border: 0px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin: 2em 0px;
-  padding: 1em;
-  background-color: #f7bf2e;
-  color: #202020;
-  transition: all .3s ease-in;
-  font-weight: bold;
-  cursor: pointer;
-  &:hover {
-    box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-      0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  img {
+    width: 80%;
   }
 `;
 
-const Toast = styled.div`
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  background-color: #06060a;
-  color: #f7bf2e;
-  padding: 2em;
-  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+const Line = styled.div`
+  width: 3px;
+  height: 80%;
+  background-color: #a0a0a0;
 `;
-
-const NoRes = styled.h5`color: #a0a0a0;`;
 
 class Home extends React.Component {
   constructor(props) {
@@ -263,71 +185,17 @@ class Home extends React.Component {
       liking,
       done
     } = this.state;
+    const { login } = this.props;
     const hasImages = Object.keys(media).indexOf("edges") > 0;
 
     return (
-      <div>
-        <SpaceBetween>
-          <div>
-            <Banner />
-          </div>
-        </SpaceBetween>
-        {!valid
-          ? <CookieForm
-              onChange={this._onChange}
-              _checkValid={this._checkIfValid}
-            />
-          : null}
-
-        {valid
-          ? <InputWrapper>
-              <Name>
-                哈囉, {username}, 我已經準備就緒
-              </Name>
-              <Input
-                placeholder="hashtag"
-                onChange={e => this.setState({ hashtag: e.target.value })}
-              />
-              <SearchBtn onClick={this._search}>搜尋</SearchBtn>
-            </InputWrapper>
-          : null}
-
-        {hasImages ? <ContentWrapper /> : null}
-        {hasImages
-          ? <StartBtn onClick={this._startLiker}>
-              {liking ? <div className="lds-dual-ring" /> : null}
-              {liking ? "努力按讚中" : "開始按讚"}
-            </StartBtn>
-          : null}
-        {hasImages
-          ? <NoRes>(免責聲明：此網站不負何過度使用後，可能被 Instagram 封鎖的責任，請適量、和取一定的間隔使用)</NoRes>
-          : null}
-        <Grid>
-          {hasImages
-            ? media.edges.map(node => {
-                return (
-                  <GridPhoto
-                    src={node.node.display_url}
-                    key={node.node.id}
-                    checked={likedImage.indexOf(node.node.id) > -1}
-                    onClick={() => this._likePhoto(node.node.id)}
-                  />
-                );
-              })
-            : null}
-        </Grid>
-
-        {done
-          ? <Toast>
-              自動按讚已完成！<br />
-              因流量關係一般用戶只提供70張的額度<br />
-              您可以重新查詢別的hashtag繼續使用<br />
-              如個人或企業有需要更多張數的服務<br />
-              請聯絡 franks0059@gmail.com<br />
-              或私訊我的IG, @mhsun_tsai
-            </Toast>
-          : null}
-      </div>
+      <SpaceBetween>
+        <Banner>
+          <img src="/images/banner.svg" />
+        </Banner>
+        <Line />
+        <LoginForm login={login} />
+      </SpaceBetween>
     );
   }
 }

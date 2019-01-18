@@ -24,6 +24,24 @@ const HEADER = ({ cookie, xCsrfToken, xInstagramAjax }) => ({
   "x-instagram-ajax": xInstagramAjax
 });
 
+app.get("/api/followers", (req, res) => {
+  const options = {
+    method: "GET",
+    headers: HEADER(req.query),
+    url: `https://www.instagram.com/graphql/query/?query_hash=56066f031e6239f35a904ac20c9f37d9&variables=%7B%22id%22%3A%22${req.query.userId}%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Atrue%2C%22first%22%3A24%7D`
+  };
+  axios(options).then(r => res.send(r.data)).catch(e => console.log(e));
+});
+
+app.get("/api/followers/more", (req, res) => {
+  const options = {
+      method: "GET",
+      headers: HEADER(req.query),
+      url: `https://www.instagram.com/graphql/query/?query_hash=56066f031e6239f35a904ac20c9f37d9&variables=%7B%22id%22%3A%22${req.query.userId}%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Atrue%2C%22first%22%3A24%22after%22%3A%22${req.query.cursor}22%7D`
+    };
+    axios(options).then(r => res.send(r.data)).catch(e => console.log(e));
+});
+
 app.get("/api/check", (req, res) => {
   const options = {
     method: "GET",
