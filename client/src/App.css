@@ -8,39 +8,13 @@ h5 {
 * {
   box-sizing: border-box;
 }
-.App {
-  text-align: center;
-}
 
 .App {
-  padding: 0px 15% 0em;
   width: 100vw;
-  overflow: scroll;
+  overflow-y: hidden;
   height: 100vh;
   background-color: #f7f7f7;
-}
-
-.lds-dual-ring {
-  display: inline-block;
-  width: 2em;
-  height: 2em;
-}
-.lds-dual-ring:after {
-  content: " ";
-  display: block;
-  width: 1em;
-  height: 1em;
-  margin: 1px;
-  border-radius: 50%;
-  border: 3px solid #202020;
-  border-color: #202020 transparent #202020 transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
-}
-@keyframes lds-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
