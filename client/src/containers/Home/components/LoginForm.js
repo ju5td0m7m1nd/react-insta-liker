@@ -37,6 +37,19 @@ const Center = styled.div`
   justify-content: center;
 `;
 
+const HowTo = styled.div`
+  margin-top: 0.8em;
+  font-size: 8px;
+  color: #404040;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 4px;
+  border-bottom: 1px solid #404040;
+`;
+
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
@@ -57,8 +70,16 @@ class LoginForm extends React.Component {
         <Input ref={c => (this.cookie = c)} label="cookie" />
         <Input ref={c => (this.xCsrfToken = c)} label="x-csrf-token" />
         <Input ref={c => (this.xInstagramAjax = c)} label="x-instagram-ajax" />
-        <Center>
+        <Center style={{ flexDirection: "column" }}>
           <LoginBtn onClick={() => login(this._getFormData())}>登入</LoginBtn>
+          <HowTo
+            onClick={() =>
+              window.open(
+                "https://medium.com/@ju5td0m7m1nd/instaliker-instagram-%E8%A1%8C%E9%8A%B7%E6%A9%9F%E5%99%A8%E4%BA%BA-bc5911b90e70"
+              )}
+          >
+            怎麼取得登入資訊?
+          </HowTo>
         </Center>
       </Container>
     );
