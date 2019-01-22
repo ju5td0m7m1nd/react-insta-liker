@@ -122,7 +122,7 @@ class Liker extends React.Component {
       });
   };
 
-  _likePhoto = id => {
+  _likePhoto = (id, userId) => {
     const { cookie, xCsrfToken, xInstagramAjax } = this.props;
     if (this.state.likedImage.indexOf(id) < 0) {
       fetch(
@@ -131,6 +131,7 @@ class Liker extends React.Component {
         .then(r => r.json())
         .then(response => {
           if (response.status === "ok") {
+            //this._followOwner(userId);
             this.setState(
               { likedImage: this.state.likedImage.concat(id) },
               this._checkIfDone
@@ -141,6 +142,21 @@ class Liker extends React.Component {
           throw new Error(e);
         });
     }
+  };
+
+  _followOwner = userId => {
+    const { cookie, xCsrfToken, xInstagramAjax } = this.props;
+    fetch(
+      `/api/follow?userId=${userId}&cookie=${cookie}&xCsrfToken=${xCsrfToken}&xInstagramAjax=${xInstagramAjax}`
+    )
+      .then(r => r.json())
+      .then(response => {
+        if (response.status === "ok") {
+        }
+      })
+      .catch(e => {
+        throw new Error(e);
+      });
   };
 
   _checkIfDone = () => {
@@ -182,7 +198,7 @@ class Liker extends React.Component {
     this.state.media.edges.map((n, key) => {
       this.likeRequests.push(
         setTimeout(() => {
-          this._likePhoto(n.node.id);
+          this._likePhoto(n.node.id, n.node.owner.id);
           // console.log(n.node.shortcode, `  ${key}`);
         }, 2000 * (key + 1))
       );

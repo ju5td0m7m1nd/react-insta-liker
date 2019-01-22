@@ -28,13 +28,26 @@ firebase.auth().onAuthStateChanged(function(user) {
   }
 });
 
-const saveFollower = userId => {
-  const db = firebase.firestore();
+const db = firebase.firestore();
 
-  const userRef = db.collection("users").doc(userId).set({
-    count: 123,
-    edges: []
+const saveFollower = async (userId, timestamp, count, edges) => {
+  const userRef = await db.collection(userId).doc(timestamp.toString()).set({
+    count,
+    edges
   });
+
+  return "done";
 };
 
-export { saveFollower };
+const getFollower = async userId => {
+  var docRef = db.collection(userId);
+
+  const data = await docRef.get();
+
+  if (!data.empty) {
+    return data.docs.map(d => ({ id: d.id, data: d.data() }));
+  }
+  return [];
+};
+
+export { saveFollower, getFollower };

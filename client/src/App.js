@@ -5,9 +5,19 @@ import Liker from "./containers/Liker";
 import Analytic from "./containers/Analytic";
 import ReactGA from "react-ga";
 import styled from "styled-components";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import "./App.css";
+
+const Loading = styled.div`
+  width: 100%;
+  height: 100vh;
+  background: #1a7eee;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const DashboardContainer = styled.section`
   width: 84%;
@@ -52,6 +62,16 @@ const LogoutBtn = styled.h3`
   cursor: pointer;
 `;
 
+const LinkButton = styled.div`
+  width: 100%;
+  margin-top: 1em;
+  a {
+    color: #222;
+    text-decoration: none;
+    font-size: 0.8em;
+  }
+`;
+
 class App extends Component {
   state = {
     response: "",
@@ -66,8 +86,36 @@ class App extends Component {
   componentDidMount() {
     ReactGA.initialize("UA-84532754-2");
     ReactGA.pageview(window.location.pathname + window.location.search);
-    this._login(window.localStorage);
+    this._checkLoginState(window.localStorage);
   }
+  _checkLoginState = data => {
+    const {
+      cookie,
+      xCsrfToken,
+      xInstagramAjax,
+      username,
+      userId,
+      profilePic
+    } = data;
+    if (
+      cookie &&
+      xCsrfToken &&
+      xInstagramAjax &&
+      username &&
+      userId &&
+      profilePic
+    ) {
+      this.setState({
+        valid: true,
+        cookie,
+        xCsrfToken,
+        xInstagramAjax,
+        username,
+        userId,
+        profilePic
+      });
+    }
+  };
   _login = data => {
     const { cookie, xCsrfToken, xInstagramAjax } = data;
     if (!cookie || !xCsrfToken || !xInstagramAjax) {
@@ -87,7 +135,7 @@ class App extends Component {
           category: "User",
           action: response.data.user.username
         });
-        this._saveToLocal(data);
+        this._saveToLocal(data, response.data);
 
         this.setState({
           valid: true,
@@ -105,14 +153,20 @@ class App extends Component {
     window.localStorage.removeItem("cookie");
     window.localStorage.removeItem("xCsrfToken");
     window.localStorage.removeItem("xInstagramAjax");
+    window.localStorage.setItem("username");
+    window.localStorage.setItem("userId");
+    window.localStorage.setItem("profilePic");
     window.location.reload();
   };
 
-  _saveToLocal = data => {
+  _saveToLocal = (data, profile) => {
     const { cookie, xCsrfToken, xInstagramAjax } = data;
     window.localStorage.setItem("cookie", cookie);
     window.localStorage.setItem("xCsrfToken", xCsrfToken);
     window.localStorage.setItem("xInstagramAjax", xInstagramAjax);
+    window.localStorage.setItem("username", profile.user.username);
+    window.localStorage.setItem("userId", profile.user.id);
+    window.localStorage.setItem("profilePic", profile.user.profile_pic_url);
   };
 
   render() {
@@ -125,7 +179,11 @@ class App extends Component {
       username,
       userId
     } = this.state;
+
     if (!valid) {
+      if (xCsrfToken) {
+        return <Loading>Loading...</Loading>;
+      }
       return (
         <div className="App">
           <Home login={this._login} />
@@ -133,17 +191,24 @@ class App extends Component {
       );
     }
     return (
-      <div className="App">
-        <SideBar>
-          <ProfileWrapper>
-            <img src={profilePic} />
-            <h3>
-              @{username}
-            </h3>
-          </ProfileWrapper>
-          <LogoutBtn onClick={this._logout}>登出</LogoutBtn>
-        </SideBar>
-        <Router>
+      <Router>
+        <div className="App">
+          <SideBar>
+            <ProfileWrapper>
+              <img src={profilePic} />
+              <h3>
+                @{username}
+              </h3>
+              <LinkButton>
+                <Link to="/">LIKER</Link>
+              </LinkButton>
+              <LinkButton>
+                <Link to="/analytic">ANALYTIC</Link>
+              </LinkButton>
+            </ProfileWrapper>
+            <LogoutBtn onClick={this._logout}>登出</LogoutBtn>
+          </SideBar>
+
           <DashboardContainer>
             <Route
               path="/"
@@ -166,8 +231,8 @@ class App extends Component {
                 />}
             />
           </DashboardContainer>
-        </Router>
-      </div>
+        </div>
+      </Router>
     );
   }
 }

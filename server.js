@@ -24,22 +24,49 @@ const HEADER = ({ cookie, xCsrfToken, xInstagramAjax }) => ({
   "x-instagram-ajax": xInstagramAjax
 });
 
+app.get("/api/followers/fans", (req, res) => {
+  const options = JSON.parse(req.query.edges).map(
+    (username, key) =>
+      new Promise((resolve, reject) =>
+        setTimeout(() => {
+          console.log(username);
+          resolve(
+            axios({
+              method: "GET",
+              headers: HEADER(req.query),
+              url: `https://www.instagram.com/${username}/?__a=1`
+            })
+          );
+        }, key * 1000)
+      )
+  );
+
+  Promise.all(options)
+    .then(r => res.send(r.map(response => response.data)))
+    .catch(e => console.log(e));
+});
+
 app.get("/api/followers", (req, res) => {
   const options = {
     method: "GET",
     headers: HEADER(req.query),
-    url: `https://www.instagram.com/graphql/query/?query_hash=56066f031e6239f35a904ac20c9f37d9&variables=%7B%22id%22%3A%22${req.query.userId}%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Atrue%2C%22first%22%3A24%7D`
+    url: `https://www.instagram.com/graphql/query/?query_hash=56066f031e6239f35a904ac20c9f37d9&variables=%7B%22id%22%3A%22${req
+      .query
+      .userId}%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Atrue%2C%22first%22%3A24%7D`
   };
   axios(options).then(r => res.send(r.data)).catch(e => console.log(e));
 });
 
 app.get("/api/followers/more", (req, res) => {
   const options = {
-      method: "GET",
-      headers: HEADER(req.query),
-      url: `https://www.instagram.com/graphql/query/?query_hash=56066f031e6239f35a904ac20c9f37d9&variables=%7B%22id%22%3A%22${req.query.userId}%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Atrue%2C%22first%22%3A24%22after%22%3A%22${req.query.cursor}22%7D`
-    };
-    axios(options).then(r => res.send(r.data)).catch(e => console.log(e));
+    method: "GET",
+    headers: HEADER(req.query),
+    url: `https://www.instagram.com/graphql/query/?query_hash=56066f031e6239f35a904ac20c9f37d9&variables=%7B%22id%22%3A%22${req
+      .query
+      .userId}%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Atrue%2C%22first%22%3A24%2C%22after%22%3A%22${req
+      .query.cursor}%22%7D`
+  };
+  axios(options).then(r => res.send(r.data)).catch(e => console.log(e));
 });
 
 app.get("/api/check", (req, res) => {
@@ -61,6 +88,16 @@ app.get("/api/like", (req, res) => {
     url: `https://www.instagram.com/web/likes/${id}/like/`
   };
 
+  axios(options).then(r => res.send(r.data)).catch(e => console.log(e));
+});
+app.get("/api/follow", (req, res) => {
+  const { query } = req;
+  const { userId } = query;
+  const options = {
+    method: "POST",
+    headers: HEADER(req.query),
+    url: `https://www.instagram.com/web/friendships/${userId}/follow/`
+  };
   axios(options).then(r => res.send(r.data)).catch(e => console.log(e));
 });
 app.get("/api/checkIfLiked", (req, res) => {
